@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUCIQ-MCP · online</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,300&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0a09; --ink:#ece6d8; --dim:#7a7367; --line:#1f1c18;
+    --phos:#9bff8c; --amber:#f1b24a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);min-height:100%}
+  body{
+    font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-weight:400;font-size:13.5px;line-height:1.55;
+    padding:32px clamp(20px,5vw,72px) 48px;
+    background-image:
+      radial-gradient(1200px 600px at 85% -10%, rgba(155,255,140,.05), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(241,178,74,.04), transparent 60%);
+    background-attachment:fixed;
+  }
+  body::before{
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      linear-gradient(transparent 0 31px, rgba(255,255,255,.018) 31px 32px),
+      linear-gradient(90deg, transparent 0 31px, rgba(255,255,255,.018) 31px 32px);
+    background-size:32px 32px;
+    mix-blend-mode:screen;opacity:.5;
+  }
+  body::after{
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .5 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity:.06;
+  }
+  main{position:relative;z-index:1;max-width:1080px;margin:0 auto}
+
+  /* top bar */
+  .bar{display:flex;align-items:baseline;justify-content:space-between;gap:24px;
+       padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .crumb{color:var(--dim);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase}
+  .crumb b{color:var(--ink);font-weight:500}
+  .live{display:inline-flex;align-items:center;gap:10px;color:var(--phos);
+        font-size:11.5px;letter-spacing:.22em;text-transform:uppercase}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--phos);
+       box-shadow:0 0 0 0 rgba(155,255,140,.6);animation:pulse 1.8s infinite}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(155,255,140,.55)}
+    70%{box-shadow:0 0 0 12px rgba(155,255,140,0)}
+    100%{box-shadow:0 0 0 0 rgba(155,255,140,0)}
+  }
+
+  /* hero */
+  .hero{padding:72px 0 48px;display:grid;grid-template-columns:1.4fr 1fr;gap:48px;
+        border-bottom:1px solid var(--line)}
+  @media (max-width:780px){.hero{grid-template-columns:1fr;padding:40px 0 32px}}
+  h1{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:300;
+    font-size:clamp(48px,8.5vw,108px);line-height:.95;letter-spacing:-.02em;
+    color:var(--ink);
+  }
+  h1 .slash{color:var(--phos);font-style:normal;font-family:'JetBrains Mono',monospace;
+            font-size:.55em;vertical-align:.32em;margin:0 .15em;font-weight:400}
+  h1 .mcp{color:var(--amber)}
+  .lead{color:var(--dim);max-width:38ch;align-self:end;font-size:14px;line-height:1.6}
+  .lead em{color:var(--ink);font-family:'Fraunces',serif;font-style:italic;font-weight:300}
+
+  /* section */
+  section{padding:36px 0;border-bottom:1px solid var(--line)}
+  .h{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
+  .h .num{color:var(--phos);font-size:11px;letter-spacing:.2em}
+  .h .lbl{color:var(--dim);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase}
+  .h .ttl{font-family:'Fraunces',serif;font-style:italic;font-weight:300;
+          font-size:24px;color:var(--ink);margin-left:auto}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0;
+        border-top:1px solid var(--line);border-left:1px solid var(--line)}
+  @media (max-width:780px){.grid{grid-template-columns:1fr}}
+  .cell{padding:22px 22px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .cell .k{color:var(--dim);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+  .cell .v{color:var(--ink);font-size:13.5px;line-height:1.55}
+  .cell .v code{color:var(--phos)}
+
+  /* endpoints table */
+  .ep{width:100%;border-collapse:collapse;font-size:13px}
+  .ep th,.ep td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+  .ep th{color:var(--dim);font-weight:400;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase}
+  .ep td.m{color:var(--phos);width:60px;font-weight:500}
+  .ep td.p{color:var(--ink)}
+  .ep td.p span{color:var(--amber)}
+  .ep td.d{color:var(--dim)}
+  .ep tr:hover td{background:rgba(255,255,255,.015)}
+
+  /* code block */
+  .code{
+    background:#08070680;border:1px solid var(--line);
+    padding:18px 20px;font-size:12.5px;line-height:1.7;color:var(--ink);
+    overflow:auto;white-space:pre;
+  }
+  .code .c{color:var(--dim)}
+  .code .s{color:var(--phos)}
+  .code .a{color:var(--amber)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:780px){.two{grid-template-columns:1fr}}
+
+  footer{padding-top:28px;display:flex;justify-content:space-between;
+         color:var(--dim);font-size:11px;letter-spacing:.18em;text-transform:uppercase;gap:16px;flex-wrap:wrap}
+  footer a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}
+  footer a:hover{color:var(--phos);border-color:var(--phos)}
+
+  ::selection{background:var(--phos);color:#0c0a09}
+</style>
+</head>
+<body>
+<main>
+
+  <header class="bar">
+    <div class="crumb">luciq-mcp<b>/</b> public bridge</div>
+    <div class="live"><span class="dot"></span>service online</div>
+  </header>
+
+  <div class="hero">
+    <h1><span class="slash">/</span>bugs<br>as <span class="mcp">JSON</span></h1>
+    <p class="lead">A tiny stdlib bridge that turns a public <em>Luciq</em> (formerly Instabug) bug-report URL into clean JSON, raw logs and the original screenshot — over plain HTTP for humans, or as an <em>MCP server</em> so AI agents can read crash reports first-hand.</p>
+  </div>
+
+  <section>
+    <div class="h">
+      <span class="num">01</span><span class="lbl">what it does</span>
+      <span class="ttl">three things, well.</span>
+    </div>
+    <div class="grid">
+      <div class="cell">
+        <div class="k">— resolve</div>
+        <div class="v">Fetches metadata for any <code>dashboard.luciq.ai/bugs/&lt;token&gt;</code> URL — title, app slug, device fields, asset list. No auth.</div>
+      </div>
+      <div class="cell">
+        <div class="k">— extract</div>
+        <div class="v">Downloads logs (<code>user_steps</code>, <code>network_log</code>, <code>console_log</code>, <code>instabug_log</code>, <code>sessions_profiler</code>, …) and the original JPEG screenshot from signed CloudFront URLs.</div>
+      </div>
+      <div class="cell">
+        <div class="k">— serve</div>
+        <div class="v">Exposes everything as a flat REST API <em>and</em> as Model Context Protocol tools — same data, two surfaces.</div>
+      </div>
+      <div class="cell">
+        <div class="k">— note</div>
+        <div class="v">Asset URLs expire ~3 weeks after the bug is fetched. Pull what you need promptly.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="h">
+      <span class="num">02</span><span class="lbl">http endpoints</span>
+      <span class="ttl">curl-able, all GET.</span>
+    </div>
+    <table class="ep">
+      <thead><tr><th>method</th><th>path</th><th>returns</th></tr></thead>
+      <tbody>
+        <tr><td class="m">GET</td><td class="p">/healthz</td><td class="d">liveness probe → <code>ok</code></td></tr>
+        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span></td><td class="d">bug metadata + asset inventory + raw payload</td></tr>
+        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span>/logs</td><td class="d">every non-empty log merged into one JSON</td></tr>
+        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span>/logs/<span>&lt;type&gt;</span></td><td class="d">a single log type (recommended)</td></tr>
+        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span>/screenshot</td><td class="d">JPEG · <code>?variant=original|big_thumb|thumb</code></td></tr>
+        <tr><td class="m">POST</td><td class="p">/mcp</td><td class="d">streamable-HTTP MCP transport (handshake required)</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <div class="h">
+      <span class="num">03</span><span class="lbl">how to use</span>
+      <span class="ttl">two flavors.</span>
+    </div>
+    <div class="two">
+      <div>
+        <div class="cell" style="border:1px solid var(--line);margin-bottom:10px">
+          <div class="k">— for humans · curl</div>
+          <div class="v">Ask any question about a bug straight from the shell.</div>
+        </div>
+<pre class="code"><span class="c"># bug overview</span>
+curl <span class="s">$HOST</span>/bugs/<span class="a">&lt;token&gt;</span>
+
+<span class="c"># a single log</span>
+curl <span class="s">$HOST</span>/bugs/<span class="a">&lt;token&gt;</span>/logs/network_log
+
+<span class="c"># the screenshot</span>
+curl -o shot.jpg \
+  <span class="s">$HOST</span>/bugs/<span class="a">&lt;token&gt;</span>/screenshot</pre>
+      </div>
+      <div>
+        <div class="cell" style="border:1px solid var(--line);margin-bottom:10px">
+          <div class="k">— for agents · MCP</div>
+          <div class="v">Wire the MCP server into Claude Desktop / Code / Cursor.</div>
+        </div>
+<pre class="code"><span class="c">// claude_desktop_config.json</span>
+{
+  <span class="s">"mcpServers"</span>: {
+    <span class="s">"luciq"</span>: {
+      <span class="s">"transport"</span>: <span class="a">"streamable-http"</span>,
+      <span class="s">"url"</span>: <span class="a">"$HOST/mcp"</span>
+    }
+  }
+}</pre>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="h">
+      <span class="num">04</span><span class="lbl">mcp tools</span>
+      <span class="ttl">exposed to the agent.</span>
+    </div>
+    <table class="ep">
+      <tbody>
+        <tr><td class="m" style="width:auto;color:var(--amber)">list_log_types()</td><td class="d">enumerate available log-type names</td></tr>
+        <tr><td class="m" style="width:auto;color:var(--amber)">get_bug(token)</td><td class="d">metadata + asset list (no log bodies)</td></tr>
+        <tr><td class="m" style="width:auto;color:var(--amber)">get_device_info(token)</td><td class="d">OS, device, app version, locale, …</td></tr>
+        <tr><td class="m" style="width:auto;color:var(--amber)">get_log(token, log_type)</td><td class="d">a single log type — recommended</td></tr>
+        <tr><td class="m" style="width:auto;color:var(--amber)">get_all_logs(token)</td><td class="d">every non-empty log merged (heavy)</td></tr>
+        <tr><td class="m" style="width:auto;color:var(--amber)">get_screenshot(token, variant?)</td><td class="d">JPEG as MCP <code>ImageContent</code> for vision models</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <footer>
+    <div>stdlib · python 3.13 · no auth</div>
+    <div><a href="/healthz">/healthz</a> &nbsp;·&nbsp; <a href="https://github.com/anthropics/mcp" target="_blank" rel="noopener">model context protocol</a></div>
+  </footer>
+
+</main>
+</body>
+</html>

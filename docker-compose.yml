@@ -1,0 +1,42 @@
+services:
+  luciq-mcp:
+    build: .
+    image: luciq-instabug-mcp:latest
+    container_name: luciq-mcp
+    restart: unless-stopped
+    environment:
+      MCP_TRANSPORT: streamable-http
+      MCP_HOST: 0.0.0.0
+      MCP_PORT: "8080"
+      MCP_PATH: /mcp
+      LOG_LEVEL: INFO
+      # CORS allowed origins for browser-based MCP clients (MCP Inspector,
+      # custom web agents). "*" works as long as no credentials are sent.
+      CORS_ORIGINS: "*"
+    # Local port mapping for direct testing. Remove once you only access it
+    # through the reverse proxy.
+    # ports:
+    #   - "8080:8080"
+    networks:
+      - reverse-proxy
+    healthcheck:
+      # streamable-http rejects plain GETs with 406 — that proves the MCP
+      # endpoint is alive without negotiating a session.
+      test: ["CMD", "python", "-c",
+             "import urllib.request, urllib.error, sys\ntry:\n  urllib.request.urlopen('http://localhost:8080/mcp', timeout=3)\nexcept urllib.error.HTTPError as e:\n  sys.exit(0 if e.code in (400,406,415) else 1)\nexcept Exception:\n  sys.exit(1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    # Traefik labels (uncomment + adjust hostname if you use Traefik):
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.docker.network=reverse-proxy"
+    #   - "traefik.http.routers.luciq-mcp.rule=Host(`luciq-mcp.local`)"
+    #   - "traefik.http.routers.luciq-mcp.entrypoints=websecure"
+    #   - "traefik.http.routers.luciq-mcp.tls=true"
+    #   - "traefik.http.services.luciq-mcp.loadbalancer.server.port=8080"
+
+networks:
+  reverse-proxy:
+    external: true
