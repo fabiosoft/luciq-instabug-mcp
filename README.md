@@ -1,9 +1,6 @@
 # luciq-instabug-mcp
 
-> **Disclaimer** — Unofficial hobby project. Not affiliated with, endorsed by,
-> or sponsored by Luciq / Instabug. "Luciq" and "Instabug" are trademarks of
-> their respective owners and are used here only to describe the public bug
-> report URLs this tool consumes.
+![](./src/assets/og.png)
 
 Fetch logs and screenshot from a public **Luciq** (formerly Instabug) bug
 report URL like `https://dashboard.luciq.ai/bugs/<token>`.
@@ -221,3 +218,8 @@ the signed CloudFront URLs we download.
 Available log types: `user_steps`, `console_log`, `instabug_log`, `user_data`,
 `network_log`, `user_events`, `sessions_profiler`. Logs are JSON arrays of
 entries (the client returns parsed JSON when possible, raw text otherwise).
+
+> **Disclaimer** — Unofficial hobby project. Not affiliated with, endorsed by,
+> or sponsored by Luciq / Instabug. "Luciq" and "Instabug" are trademarks of
+> their respective owners and are used here only to describe the public bug
+> report URLs this tool consumes.
