@@ -1,26 +1,11 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg
-*.egg-info/
-.Python
-build/
+# Node
+node_modules/
 dist/
-
-# Virtual environments
-.venv/
-venv/
-env/
-.python-version
+*.tsbuildinfo
 
 # Tooling caches
-.mypy_cache/
-.pytest_cache/
-.ruff_cache/
-.tox/
-.coverage
-htmlcov/
+.vercel/
+.wrangler/
 
 # Editors / OS
 .vscode/

@@ -1,10 +1,10 @@
-.PHONY: help setup install sync net build up down restart logs ps health \
-        mcp-add mcp-remove mcp-list start clean
+.PHONY: help install dev build start typecheck clean \
+        net docker-build up down restart logs ps health \
+        mcp-add mcp-remove mcp-list start-stack \
+        vercel-dev vercel-deploy cf-dev cf-deploy
 
 # ------------------------------------------------------------------ config
-PY            ?= python3
-VENV          ?= .venv
-UV            ?= uv
+NPM           ?= npm
 NETWORK       ?= reverse-proxy
 MCP_NAME      ?= luciq
 MCP_URL_LOCAL ?= http://localhost:8080/mcp
@@ -12,7 +12,7 @@ MCP_URL_PROXY ?= http://luciq.mcp.localhost/mcp
 MCP_SCOPE     ?= user
 
 # ------------------------------------------------------------------ mode
-# MODE selects the deploy shape. Override on the command line:
+# MODE selects the Docker deploy shape. Override on the command line:
 #   make up MODE=local    → host port 8080 published
 #   make up MODE=proxy    → join reverse-proxy network, Traefik routes :80
 MODE          ?= local
@@ -36,22 +36,30 @@ help:
 	@awk 'BEGIN {FS = ":.*##"; printf "\nTargets (MODE=$(MODE)):\n"} \
 	      /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-# ------------------------------------------------------------------ python (uv)
-setup: install ## Create venv and install Python deps via uv
+# ------------------------------------------------------------------ node
+install: ## Install npm dependencies
+	$(NPM) install
 
-install: ## Create $(VENV) and install requirements with uv
-	@command -v $(UV) >/dev/null || { echo "uv not found — install: curl -LsSf https://astral.sh/uv/install.sh | sh"; exit 1; }
-	$(UV) venv $(VENV)
-	$(UV) pip install -r requirements.txt --python $(VENV)/bin/python
+dev: ## Run dev server with watch (tsx)
+	$(NPM) run dev
 
-sync: ## Re-sync deps into existing venv
-	$(UV) pip sync requirements.txt --python $(VENV)/bin/python
+build: ## Build TypeScript → dist/
+	$(NPM) run build
+
+start: ## Run compiled server (requires `make build`)
+	$(NPM) run serve
+
+typecheck: ## Type-check without emitting
+	$(NPM) run typecheck
+
+clean: ## Remove build outputs and caches
+	rm -rf dist node_modules .vercel .wrangler
 
 # ------------------------------------------------------------------ docker
 net: ## Create the external reverse-proxy docker network if missing
 	@docker network inspect $(NETWORK) >/dev/null 2>&1 || docker network create $(NETWORK)
 
-build: ## Build the docker image (respects MODE)
+docker-build: ## Build the docker image (respects MODE)
 	$(COMPOSE) build
 
 up: $(NEED_NET) ## Start the MCP server in MODE=local|proxy (detached)
@@ -69,8 +77,9 @@ logs: ## Tail container logs
 ps: ## Show container status
 	$(COMPOSE) ps
 
-health: ## Probe the MCP endpoint of the current MODE (406 = healthy)
-	@curl -s -o /dev/null -w "HTTP %{http_code} @ $(MCP_URL)\n" $(MCP_URL) || true
+health: ## Probe /healthz on the current MODE
+	@curl -sS -o /dev/null -w "HTTP %{http_code} @ $(MCP_URL)\n" $(MCP_URL) || true
+	@curl -sS -w "HTTP %{http_code} @ $(subst /mcp,/healthz,$(MCP_URL))\n" $(subst /mcp,/healthz,$(MCP_URL)) || true
 
 # ------------------------------------------------------------------ claude code cli
 mcp-add: ## Register MCP in Claude CLI for the current MODE
@@ -84,8 +93,18 @@ mcp-list: ## List configured MCP servers
 	claude mcp list
 
 # ------------------------------------------------------------------ all-in-one
-start: up health mcp-add mcp-list ## Build, run, register and verify (current MODE)
+start-stack: up health mcp-add mcp-list ## Build, run, register and verify (current MODE)
 
-# ------------------------------------------------------------------ misc
-clean: ## Remove venv and Python caches
-	rm -rf $(VENV) __pycache__ */__pycache__ .pytest_cache
+# ------------------------------------------------------------------ vercel
+vercel-dev: ## Run Vercel dev server (auto-installs vercel CLI on demand)
+	npx vercel dev
+
+vercel-deploy: ## Deploy to Vercel (production)
+	npx vercel deploy --prod
+
+# ------------------------------------------------------------------ cloudflare pages
+cf-dev: ## Run Cloudflare Pages dev (wrangler)
+	npx wrangler pages dev . --compatibility-flags=nodejs_compat
+
+cf-deploy: ## Deploy to Cloudflare Pages
+	npx wrangler pages deploy .

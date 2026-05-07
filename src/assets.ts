@@ -1,4 +1,19 @@
-<!doctype html>
+/**
+ * Static assets inlined as strings so the same module works across Node,
+ * Vercel functions and Cloudflare Workers/Pages without filesystem access.
+ *
+ * Source of truth — the standalone index.html / favicon.svg files used by
+ * the Python prototype have been replaced by these constants.
+ */
+
+export const FAVICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
+  <rect width="32" height="32" rx="7" fill="#0c0a09"/>
+  <path d="M21 7 L11 25" stroke="#9bff8c" stroke-width="3.4" stroke-linecap="square" fill="none"/>
+  <circle cx="24.5" cy="7.5" r="2.6" fill="#9bff8c"/>
+</svg>
+`;
+
+export const INDEX_HTML = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -126,7 +141,7 @@
 
   <div class="hero">
     <h1><span class="slash">/</span>bugs<br>as <span class="mcp">JSON</span></h1>
-    <p class="lead">A tiny stdlib bridge that turns a public <em>Luciq</em> (formerly Instabug) bug-report URL into clean JSON, raw logs and the original screenshot — over plain HTTP for humans, or as an <em>MCP server</em> so AI agents can read crash reports first-hand.</p>
+    <p class="lead">A tiny TypeScript bridge that turns a public <em>Luciq</em> (formerly Instabug) bug-report URL into clean JSON, raw logs and the original screenshot — over plain HTTP for humans, or as an <em>MCP server</em> so AI agents can read crash reports first-hand.</p>
   </div>
 
   <section>
@@ -190,7 +205,7 @@ curl <span class="s">$HOST</span>/bugs/<span class="a">&lt;token&gt;</span>
 curl <span class="s">$HOST</span>/bugs/<span class="a">&lt;token&gt;</span>/logs/network_log
 
 <span class="c"># the screenshot</span>
-curl -o shot.jpg \
+curl -o shot.jpg \\
   <span class="s">$HOST</span>/bugs/<span class="a">&lt;token&gt;</span>/screenshot</pre>
       </div>
       <div>
@@ -229,10 +244,11 @@ curl -o shot.jpg \
   </section>
 
   <footer>
-    <div>stdlib · python 3.13 · no auth</div>
+    <div>typescript · hono · no auth</div>
     <div><a href="/healthz">/healthz</a> &nbsp;·&nbsp; <a href="https://github.com/anthropics/mcp" target="_blank" rel="noopener">model context protocol</a></div>
   </footer>
 
 </main>
 </body>
 </html>
+`;
