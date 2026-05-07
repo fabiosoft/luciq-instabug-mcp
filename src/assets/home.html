@@ -1,19 +1,4 @@
-/**
- * Static assets inlined as strings so the same module works across Node,
- * Vercel functions and Cloudflare Workers/Pages without filesystem access.
- *
- * Source of truth — the standalone index.html / favicon.svg files used by
- * the Python prototype have been replaced by these constants.
- */
-
-export const FAVICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" shape-rendering="geometricPrecision">
-  <rect width="32" height="32" rx="7" fill="#0c0a09"/>
-  <path d="M21 7 L11 25" stroke="#9bff8c" stroke-width="3.4" stroke-linecap="square" fill="none"/>
-  <circle cx="24.5" cy="7.5" r="2.6" fill="#9bff8c"/>
-</svg>
-`;
-
-export const INDEX_HTML = `<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -219,7 +204,7 @@ curl <span class="s">$HOST</span>/bugs/<span class="a">&lt;token&gt;</span>
 curl <span class="s">$HOST</span>/bugs/<span class="a">&lt;token&gt;</span>/logs/network_log
 
 <span class="c"># the screenshot</span>
-curl -o shot.jpg \\
+curl -o shot.jpg \
   <span class="s">$HOST</span>/bugs/<span class="a">&lt;token&gt;</span>/screenshot</pre>
       </div>
       <div>
@@ -264,10 +249,9 @@ curl -o shot.jpg \\
 
   <footer>
   <div>© 2026</div>
-  <div><a href="/healthz">/healthz</a> &nbsp;·&nbsp; <a href="https://github.com/anthropics/mcp" target="_blank" rel="noopener">model context protocol</a></div>
+  <div><a href="/healthz">/healthz</a> &nbsp;·&nbsp; <a href="/privacy">privacy</a> &nbsp;·&nbsp; <a href="https://github.com/anthropics/mcp" target="_blank" rel="noopener">model context protocol</a></div>
   </footer>
 
 </main>
 </body>
 </html>
-`;

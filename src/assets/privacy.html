@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LUCIQ-MCP · privacy</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@1,9..144,300&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0a09; --ink:#ece6d8; --dim:#7a7367; --line:#1f1c18;
+    --phos:#9bff8c; --amber:#f1b24a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);min-height:100%}
+  body{
+    font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-weight:400;font-size:13.5px;line-height:1.7;
+    padding:32px clamp(20px,5vw,72px) 48px;
+    background-image:
+      radial-gradient(1200px 600px at 85% -10%, rgba(155,255,140,.05), transparent 60%),
+      radial-gradient(900px 500px at -10% 110%, rgba(241,178,74,.04), transparent 60%);
+    background-attachment:fixed;
+  }
+  body::before{
+    content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:
+      linear-gradient(transparent 0 31px, rgba(255,255,255,.018) 31px 32px),
+      linear-gradient(90deg, transparent 0 31px, rgba(255,255,255,.018) 31px 32px);
+    background-size:32px 32px;
+    mix-blend-mode:screen;opacity:.5;
+  }
+  main{position:relative;z-index:1;max-width:880px;margin:0 auto}
+
+  .bar{display:flex;align-items:baseline;justify-content:space-between;gap:24px;
+       padding-bottom:14px;border-bottom:1px solid var(--line)}
+  .crumb{color:var(--dim);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase}
+  .crumb b{color:var(--ink);font-weight:500}
+  .crumb a{color:var(--dim);text-decoration:none}
+  .crumb a:hover{color:var(--phos)}
+  .stamp{color:var(--dim);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase}
+
+  .hero{padding:64px 0 36px;border-bottom:1px solid var(--line)}
+  h1{
+    font-family:'Fraunces',serif;font-style:italic;font-weight:300;
+    font-size:clamp(40px,7vw,84px);line-height:.98;letter-spacing:-.02em;
+    color:var(--ink);
+  }
+  h1 .slash{color:var(--phos);font-style:normal;font-family:'JetBrains Mono',monospace;
+            font-size:.55em;vertical-align:.32em;margin:0 .15em;font-weight:400}
+  .lead{margin-top:22px;color:var(--dim);max-width:64ch;font-size:14px;line-height:1.7}
+  .lead em{color:var(--ink);font-family:'Fraunces',serif;font-style:italic;font-weight:300}
+
+  section{padding:36px 0;border-bottom:1px solid var(--line)}
+  .h{display:flex;align-items:baseline;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .h .num{color:var(--phos);font-size:11px;letter-spacing:.2em}
+  .h .lbl{color:var(--dim);font-size:11.5px;letter-spacing:.22em;text-transform:uppercase}
+  .h .ttl{font-family:'Fraunces',serif;font-style:italic;font-weight:300;
+          font-size:22px;color:var(--ink);margin-left:auto}
+
+  p{color:var(--ink);margin:0 0 14px;max-width:72ch}
+  p+p{margin-top:0}
+  a{color:var(--ink);border-bottom:1px solid var(--line);text-decoration:none}
+  a:hover{color:var(--phos);border-color:var(--phos)}
+  code{color:var(--phos);font-size:.92em}
+  strong{color:var(--ink);font-weight:500}
+  em{color:var(--ink);font-family:'Fraunces',serif;font-style:italic;font-weight:300}
+
+  ul{margin:6px 0 14px 0;padding-left:0;list-style:none}
+  ul li{position:relative;padding-left:18px;color:var(--ink);margin-bottom:6px;max-width:72ch}
+  ul li::before{content:'—';position:absolute;left:0;color:var(--phos)}
+  ul li ul{margin:6px 0 6px 0}
+  ul li ul li::before{content:'·';color:var(--dim)}
+
+  .callout{
+    margin:14px 0;padding:14px 18px;
+    border:1px solid var(--line);border-left:2px solid var(--amber);
+    background:rgba(241,178,74,.04);
+    color:var(--dim);font-size:12.5px;line-height:1.65;
+  }
+  .callout b{color:var(--ink);font-weight:500}
+
+  table.tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin:6px 0 8px}
+  table.tbl th,table.tbl td{
+    text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top
+  }
+  table.tbl th{
+    color:var(--dim);font-weight:400;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase
+  }
+  table.tbl td{color:var(--ink)}
+  table.tbl td:first-child{color:var(--amber)}
+
+  footer{padding-top:28px;display:flex;justify-content:space-between;
+         color:var(--dim);font-size:11px;letter-spacing:.18em;text-transform:uppercase;gap:16px;flex-wrap:wrap}
+  footer a{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)}
+  footer a:hover{color:var(--phos);border-color:var(--phos)}
+
+  ::selection{background:var(--phos);color:#0c0a09}
+</style>
+</head>
+<body>
+<main>
+
+  <header class="bar">
+    <div class="crumb"><a href="/">luciq-mcp</a><b>/</b> privacy</div>
+    <div class="stamp">last updated · 2026-05-07</div>
+  </header>
+
+  <div class="hero">
+    <h1><span class="slash">/</span>privacy</h1>
+    <p class="lead"><strong>luciq-instabug-mcp</strong> is an unofficial, open-source hobby project that relays publicly accessible <em>Luciq</em> (formerly Instabug) bug reports as JSON, REST, and MCP. It is <strong>not affiliated with, endorsed by, or sponsored by Luciq / Instabug</strong>. This notice describes how personal data is handled by the reference deployment.</p>
+    <div class="callout">
+      If you self-host this Service, <b>you become the data controller</b>
+    </div>
+  </div>
+
+  <section>
+    <div class="h"><span class="num">02</span><span class="lbl">what the service does</span><span class="ttl">stateless relay.</span></div>
+    <p>The Service is <strong>stateless</strong>. On each request it:</p>
+    <ul>
+      <li>Receives a Luciq share token (or full <code>dashboard.luciq.ai/bugs/&lt;token&gt;</code> URL) supplied by the caller.</li>
+      <li>Forwards a request to the public Luciq API (<code>https://api.luciq.ai/api/web/public/bugs/&lt;token&gt;</code>) and, when needed, downloads the signed CloudFront assets referenced in the response (logs, JPEG screenshot).</li>
+      <li>Streams the result back to the caller.</li>
+    </ul>
+    <p>The Service:</p>
+    <ul>
+      <li>Has <strong>no user accounts</strong>, no login, no cookies, no analytics.</li>
+      <li><strong>Does not persist</strong> bug data, logs, screenshots, request bodies, or responses to any database, cache, or disk on the server.</li>
+      <li><strong>Does not sell, share, or transfer</strong> any data to third parties beyond the upstream Luciq API needed to fulfill the request.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="h"><span class="num">03</span><span class="lbl">data processed in transit</span><span class="ttl">held only for the request.</span></div>
+    <table class="tbl">
+      <thead><tr><th>category</th><th>source</th><th>purpose</th><th>retention</th></tr></thead>
+      <tbody>
+        <tr><td>Luciq share token</td><td>URL path / query / MCP arg</td><td>Look up the bug on api.luciq.ai</td><td>Not stored — held in memory for the request</td></tr>
+        <tr><td>Bug payload</td><td>api.luciq.ai → us → caller</td><td>Relay metadata, logs, screenshot to caller</td><td>Not stored</td></tr>
+        <tr><td>Caller IP, User-Agent, path</td><td>Inbound HTTP request</td><td>Diagnostics, abuse prevention</td><td>Server access logs (see §04)</td></tr>
+      </tbody>
+    </table>
+    <p>Bug reports authored through Luciq may contain personal data of end-users of the originating application (names, emails, device IDs, screen content, IP addresses, free-text feedback). The Service <strong>transports</strong> this data but does not control or curate it. The original application publisher remains the controller of that data; lawful basis for accessing a given bug token is the responsibility of the caller.</p>
+  </section>
+
+  <section>
+    <div class="h"><span class="num">04</span><span class="lbl">server logs</span><span class="ttl">depends on the host.</span></div>
+    <p>Depending on the hosting environment, short-lived access logs may exist:</p>
+    <ul>
+      <li><strong>Docker / self-host:</strong> stdout logs containing timestamp, method, path, status. Token values are part of the URL path and will appear in those lines unless the operator strips them. Retention is whatever the operator's <code>docker logs</code> / log driver is configured for.</li>
+      <li><strong>Vercel / Cloudflare Pages:</strong> the platform retains its own request logs per its own privacy terms.
+        <ul>
+          <li>Vercel: <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener">vercel.com/legal/privacy-policy</a></li>
+          <li>Cloudflare: <a href="https://www.cloudflare.com/privacypolicy/" target="_blank" rel="noopener">cloudflare.com/privacypolicy</a></li>
+        </ul>
+      </li>
+      <li><strong>MCP stdio transport:</strong> runs locally on your machine, no remote logs.</li>
+    </ul>
+    <p>Operators who consider Luciq tokens or caller IPs sensitive should configure log redaction at the reverse-proxy or hosting layer.</p>
+  </section>
+
+  <section>
+    <div class="h"><span class="num">05</span><span class="lbl">third parties</span><span class="ttl">no analytics, no ads.</span></div>
+    <ul>
+      <li><strong>api.luciq.ai / dashboard.luciq.ai / Luciq CloudFront:</strong> every request to the Service triggers an outbound request to Luciq infrastructure to fetch the bug. Luciq's privacy policy applies to that exchange.</li>
+      <li><strong>Google Fonts</strong> (<code>fonts.googleapis.com</code>, <code>fonts.gstatic.com</code>): the public landing page (<code>/</code>) and this privacy page load Fraunces and JetBrains Mono from Google. This exposes the visitor's IP and User-Agent to Google. The API and MCP endpoints do not load any fonts.</li>
+      <li>No advertising, no tag managers, no third-party analytics.</li>
+    </ul>
+    <div class="callout">
+      If self-hosting in the EU and you wish to avoid any Google Fonts transfer, self-host the font files</code>.
+    </div>
+  </section>
+
+  <section>
+    <div class="h"><span class="num">06</span><span class="lbl">cookies &amp; storage</span><span class="ttl">none.</span></div>
+    <p>The Service sets <strong>no cookies</strong> and writes nothing to the client's local storage.</p>
+  </section>
+
+  <section>
+    <div class="h"><span class="num">07</span><span class="lbl">international transfers</span><span class="ttl">edge-routed.</span></div>
+    <p>The reference deployment may run on Vercel or Cloudflare edge networks, which route traffic globally. Outbound calls to Luciq and CloudFront also cross borders. Each operator should evaluate whether their deployment region and these transfers are compatible with their obligations.</p>
+  </section>
+
+  <section>
+    <div class="h"><span class="num">08</span><span class="lbl">your rights</span><span class="ttl">GDPR / CCPA.</span></div>
+    <p>Because the Service stores nothing, there is no on-server record to access, rectify, port, or delete.</p>
+    <ul>
+      <li>For personal data <strong>contained inside Luciq bug reports</strong>, contact the application publisher who collected the bug, or Luciq / Instabug directly.</li>
+      <li>For personal data in <strong>server access logs</strong> of a specific deployment, contact that deployment's operator.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="h"><span class="num">09</span><span class="lbl">security</span><span class="ttl">tokens are unguessable URLs.</span></div>
+    <ul>
+      <li>Transport is HTTPS in the hosted reference deployment; self-hosted users are responsible for terminating TLS.</li>
+      <li>No long-lived secrets are required to use the Service. The upstream Luciq share tokens are sensitive — anyone holding a token can fetch the associated bug. Treat them as you would any unguessable URL.</li>
+    </ul>
+  </section>
+
+  <section>
+    <div class="h"><span class="num">10</span><span class="lbl">changes</span><span class="ttl">tracked in changelog.</span></div>
+    <p>This policy may be updated; the date at the top reflects the most recent revision. Material changes will be noted in the project changelog.</p>
+  </section>
+
+  <footer>
+    <div>© 2026</div>
+    <div><a href="/">/home</a> &nbsp;·&nbsp; <a href="/healthz">/healthz</a></div>
+  </footer>
+
+</main>
+</body>
+</html>

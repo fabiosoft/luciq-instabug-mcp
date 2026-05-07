@@ -9,7 +9,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
-import { INDEX_HTML, FAVICON_SVG } from "./assets.js";
+import { INDEX_HTML, PRIVACY_HTML, FAVICON_SVG } from "./assets.js";
 import {
   LOG_TYPES,
   LuciqError,
@@ -46,6 +46,8 @@ app.use("*", (c, next) => {
 // --- static -----------------------------------------------------------------
 
 app.get("/", (c) => c.html(INDEX_HTML));
+
+app.get("/privacy", (c) => c.html(PRIVACY_HTML));
 
 app.get("/healthz", (c) => c.text("ok\n"));
 

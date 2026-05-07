@@ -5,12 +5,18 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "assets": "node scripts/build-assets.mjs",
+    "predev": "npm run assets",
     "dev": "tsx watch src/bin/serve.ts",
+    "prestart": "npm run assets",
     "start": "tsx src/bin/serve.ts",
+    "prebuild": "npm run assets",
     "build": "tsc -p tsconfig.json",
     "serve": "node dist/bin/serve.js",
+    "premcp:stdio": "npm run assets",
     "mcp:stdio": "tsx src/bin/mcp-stdio.ts",
     "fetch": "tsx src/cli.ts",
+    "pretypecheck": "npm run assets",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
