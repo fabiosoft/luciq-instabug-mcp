@@ -25,9 +25,11 @@ out/
 *.jpg
 *.png
 !preview*.png
+!src/assets/*.png
 
 # Local secrets / overrides
 .env
 .env.*
 !.env.example
 docker-compose.override.yml
+.vercel

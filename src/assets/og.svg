@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="g1" cx="85%" cy="-10%" r="60%">
+      <stop offset="0%" stop-color="#9bff8c" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#9bff8c" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="g2" cx="-10%" cy="110%" r="60%">
+      <stop offset="0%" stop-color="#f1b24a" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#f1b24a" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#ffffff" stroke-opacity="0.025" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="630" fill="#0c0a09"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <rect width="1200" height="630" fill="url(#g1)"/>
+  <rect width="1200" height="630" fill="url(#g2)"/>
+
+  <!-- top crumb -->
+  <g font-family="ui-monospace, 'JetBrains Mono', Menlo, monospace" font-size="18" letter-spacing="3">
+    <text x="72" y="86" fill="#7a7367">LUCIQ-MCP</text>
+    <text x="218" y="86" fill="#ece6d8">/ PUBLIC BRIDGE</text>
+  </g>
+
+  <!-- live dot, top right -->
+  <g transform="translate(990,80)">
+    <circle cx="0" cy="-6" r="6" fill="#9bff8c"/>
+    <text x="16" y="0" font-family="ui-monospace, 'JetBrains Mono', Menlo, monospace" font-size="18" letter-spacing="3" fill="#9bff8c">SERVICE ONLINE</text>
+  </g>
+
+  <!-- divider -->
+  <line x1="72" y1="110" x2="1128" y2="110" stroke="#1f1c18" stroke-width="1"/>
+
+  <!-- title -->
+  <g font-family="'Fraunces', 'Times New Roman', serif" font-style="italic" font-weight="300">
+    <text x="72" y="290" font-size="170" fill="#ece6d8">
+      <tspan fill="#9bff8c" font-style="normal" font-family="ui-monospace, 'JetBrains Mono', Menlo, monospace" font-size="100" dy="-30">/</tspan><tspan dx="-8" dy="30">bugs</tspan>
+    </text>
+    <text x="72" y="450" font-size="170" fill="#ece6d8">
+      as <tspan fill="#f1b24a">JSON</tspan>
+    </text>
+  </g>
+
+  <!-- divider -->
+  <line x1="72" y1="500" x2="1128" y2="500" stroke="#1f1c18" stroke-width="1"/>
+
+  <!-- lead -->
+  <g font-family="ui-monospace, 'JetBrains Mono', Menlo, monospace" font-size="22" fill="#7a7367">
+    <text x="72" y="548">A tiny bridge that turns a public Luciq (Instabug) bug-report URL</text>
+    <text x="72" y="580">into clean JSON, raw logs and screenshots — REST + MCP server.</text>
+  </g>
+
+  <!-- bottom-right tag -->
+  <g font-family="ui-monospace, 'JetBrains Mono', Menlo, monospace" font-size="16" letter-spacing="3">
+    <text x="1128" y="580" text-anchor="end" fill="#f1b24a">MODEL CONTEXT PROTOCOL</text>
+  </g>
+</svg>
