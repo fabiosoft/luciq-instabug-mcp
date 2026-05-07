@@ -1,5 +1,10 @@
 # luciq-instabug-mcp
 
+> **Disclaimer** — Unofficial hobby project. Not affiliated with, endorsed by,
+> or sponsored by Luciq / Instabug. "Luciq" and "Instabug" are trademarks of
+> their respective owners and are used here only to describe the public bug
+> report URLs this tool consumes.
+
 Fetch logs and screenshot from a public **Luciq** (formerly Instabug) bug
 report URL like `https://dashboard.luciq.ai/bugs/<token>`.
 

@@ -129,6 +129,20 @@ export const INDEX_HTML = `<!doctype html>
   footer a:hover{color:var(--phos);border-color:var(--phos)}
 
   ::selection{background:var(--phos);color:#0c0a09}
+
+  /* unofficial disclaimer */
+  .disclaimer{
+    margin-top:28px;padding:14px 18px;
+    border:1px solid var(--line);border-left:2px solid var(--amber);
+    background:rgba(241,178,74,.04);
+    color:var(--dim);font-size:11.5px;line-height:1.6;
+    display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;
+  }
+  .disclaimer b{color:var(--ink);font-weight:500}
+  .disclaimer .tag{
+    color:var(--amber);font-size:10.5px;letter-spacing:.22em;
+    text-transform:uppercase;flex-shrink:0;padding-top:2px;
+  }
 </style>
 </head>
 <body>
@@ -243,9 +257,14 @@ curl -o shot.jpg \\
     </table>
   </section>
 
+  <div class="disclaimer">
+    <span class="tag">unofficial</span>
+    Hobby project — <b>not affiliated with, endorsed by, or sponsored by Luciq / Instabug</b>. Trademarks belong to their respective owners; used here only to describe the public bug-report URLs this tool consumes.
+  </div>
+
   <footer>
-    <div>typescript · hono · no auth</div>
-    <div><a href="/healthz">/healthz</a> &nbsp;·&nbsp; <a href="https://github.com/anthropics/mcp" target="_blank" rel="noopener">model context protocol</a></div>
+  <div>© 2026</div>
+  <div><a href="/healthz">/healthz</a> &nbsp;·&nbsp; <a href="https://github.com/anthropics/mcp" target="_blank" rel="noopener">model context protocol</a></div>
   </footer>
 
 </main>
