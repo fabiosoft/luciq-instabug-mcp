@@ -6,8 +6,7 @@
   "private": true,
   "scripts": {
     "assets": "node scripts/build-assets.mjs",
-    "predev": "npm run assets",
-    "dev": "tsx watch src/bin/serve.ts",
+    "dev": "node scripts/dev.mjs",
     "prestart": "npm run assets",
     "start": "tsx src/bin/serve.ts",
     "prebuild": "npm run assets",
