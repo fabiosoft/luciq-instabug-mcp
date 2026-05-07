@@ -5,19 +5,17 @@ services:
     container_name: luciq-mcp
     restart: unless-stopped
     environment:
-      MCP_TRANSPORT: streamable-http
-      MCP_HOST: 0.0.0.0
-      MCP_PORT: "8080"
-      MCP_PATH: /mcp
-      LOG_LEVEL: INFO
+      PORT: "8080"
+      HOST: 0.0.0.0
+      LOG_LEVEL: info
       # CORS allowed origins for browser-based MCP clients (MCP Inspector,
       # custom web agents). "*" works as long as no credentials are sent.
       CORS_ORIGINS: "*"
     healthcheck:
-      # streamable-http rejects plain GETs with 406 — that proves the MCP
-      # endpoint is alive without negotiating a session.
-      test: ["CMD", "python", "-c",
-             "import urllib.request, urllib.error, sys\ntry:\n  urllib.request.urlopen('http://localhost:8080/mcp', timeout=3)\nexcept urllib.error.HTTPError as e:\n  sys.exit(0 if e.code in (400,406,415) else 1)\nexcept Exception:\n  sys.exit(1)"]
+      # The /healthz route always returns 200; if the process is wedged this
+      # request hangs and the healthcheck fails.
+      test: ["CMD", "node", "-e",
+             "fetch('http://127.0.0.1:8080/healthz').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
       interval: 30s
       timeout: 5s
       retries: 3

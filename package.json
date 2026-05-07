@@ -1,0 +1,35 @@
+{
+  "name": "luciq-instabug-mcp",
+  "version": "0.2.0",
+  "description": "Bridge that turns a public Luciq (Instabug) bug-report URL into JSON, raw logs and screenshot — REST + MCP.",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "assets": "node scripts/build-assets.mjs",
+    "predev": "npm run assets",
+    "dev": "tsx watch src/bin/serve.ts",
+    "prestart": "npm run assets",
+    "start": "tsx src/bin/serve.ts",
+    "prebuild": "npm run assets",
+    "build": "tsc -p tsconfig.json",
+    "serve": "node dist/bin/serve.js",
+    "premcp:stdio": "npm run assets",
+    "mcp:stdio": "tsx src/bin/mcp-stdio.ts",
+    "fetch": "tsx src/cli.ts",
+    "pretypecheck": "npm run assets",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.13.7",
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "hono": "^4.6.14"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

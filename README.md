@@ -1,13 +1,21 @@
 # luciq-instabug-mcp
 
-Fetch logs and screenshot from a public **Luciq** (formerly Instabug) bug report
-URL like `https://dashboard.luciq.ai/bugs/<token>`.
+> **Disclaimer** — Unofficial hobby project. Not affiliated with, endorsed by,
+> or sponsored by Luciq / Instabug. "Luciq" and "Instabug" are trademarks of
+> their respective owners and are used here only to describe the public bug
+> report URLs this tool consumes.
+
+Fetch logs and screenshot from a public **Luciq** (formerly Instabug) bug
+report URL like `https://dashboard.luciq.ai/bugs/<token>`.
 
 The public API requires no auth. Logs and the screenshot live on signed
 CloudFront URLs that expire ~3 weeks after metadata is fetched, so download
 them promptly.
 
-## Quickstart (Docker + HTTP locale)
+Same data exposed two ways: a flat REST API and a Model Context Protocol
+server (stdio + streamable-HTTP). Written in TypeScript, deployable to **Docker**, **Vercel** and **Cloudflare Pages** from the same source.
+
+## Quickstart (Docker locale)
 
 Requires Docker and the [Claude Code CLI](https://docs.claude.com/claude-code).
 Pick a **deploy mode** with `MODE=`:
@@ -20,73 +28,100 @@ Pick a **deploy mode** with `MODE=`:
 One-shot bootstrap (build + start + register in Claude CLI + verify):
 
 ```bash
-make start              # MODE=local (default)
+make start-stack              # MODE=local (default)
 # or
-make start MODE=proxy   # behind a Traefik reverse proxy on :80
+make start-stack MODE=proxy   # behind a Traefik reverse proxy on :80
 ```
 
 Or step by step:
 
 ```bash
 make up MODE=local      # build + run in the chosen mode
-make health             # HTTP 406 means the MCP endpoint is alive (by design)
+make health             # /mcp → 405 by design, /healthz → 200
 make mcp-add            # registers the right URL for the current MODE
 make mcp-list           # → luciq: ... ✓ Connected
 ```
 
-Modes are implemented as compose overrides: [docker-compose.yml](docker-compose.yml)
-is the base, [docker-compose.local.yml](docker-compose.local.yml) and
+Modes are implemented as compose overrides:
+[docker-compose.yml](docker-compose.yml) is the base,
+[docker-compose.local.yml](docker-compose.local.yml) and
 [docker-compose.proxy.yml](docker-compose.proxy.yml) only carry the diff.
 Tear down with `make down` (use the same `MODE=` you started with).
 
 Run `make help` for the full target list.
 
-## Quickstart (Python locale, no Docker)
+## Quickstart (Node locale, no Docker)
 
-Requires [`uv`](https://docs.astral.sh/uv/) and Python 3.10+.
+Requires Node 20+.
 
 ```bash
-make setup                                    # creates .venv and installs deps via uv
-.venv/bin/python luciq_fetch.py <url>         # one-shot CLI download
-
-# Run the MCP server in HTTP mode on localhost:8080
-MCP_TRANSPORT=streamable-http \
-  .venv/bin/python luciq_mcp_server.py &
-make mcp-add                                  # register it in Claude CLI (MODE=local)
+make install            # npm install
+make dev                # tsx watch — hot-reload on src/ changes
+# or
+make build && make start
 ```
 
-For stdio mode (agent spawns the server as a subprocess) see
-[Use it from Claude Desktop / Claude Code (stdio)](#use-it-from-claude-desktop--claude-code-stdio).
+Defaults: server on `http://0.0.0.0:8080`, MCP at `/mcp`.
+Override with `PORT`, `HOST`, `LOG_LEVEL`, `CORS_ORIGINS`.
+
+For the one-shot CLI download:
+
+```bash
+npx tsx src/cli.ts https://dashboard.luciq.ai/bugs/<token>
+# → ./bug-<number>/{bug.json, logs/*.json, screenshot.jpg}
+```
+
+Options: `-o OUT`, `--no-screenshot`, `--logs instabug_log,network_log`, `--quiet`.
+
+## Deploy on Vercel
+
+```bash
+make vercel-deploy      # npx vercel deploy --prod
+```
+
+[vercel.json](vercel.json) rewrites every request to the catch-all function
+[api/index.ts](api/index.ts), which delegates to the shared Hono app.
+Local preview: `make vercel-dev`.
+
+## Deploy on Cloudflare Pages
+
+```bash
+make cf-deploy          # npx wrangler pages deploy .
+```
+
+[wrangler.toml](wrangler.toml) enables `nodejs_compat`. The
+[functions/[[path]].ts](functions/%5B%5Bpath%5D%5D.ts) catch-all forwards
+every request to the same Hono app.
+Local preview: `make cf-dev`.
 
 ## Layout
 
-- [luciq_client.py](luciq_client.py) — pure-Python client (stdlib only).
-  Reusable from the upcoming MCP server.
-- [luciq_fetch.py](luciq_fetch.py) — CLI wrapper.
-- [luciq_server.py](luciq_server.py) — minimal REST HTTP wrapper (stdlib).
-- [luciq_mcp_server.py](luciq_mcp_server.py) — **MCP server** for AI agents
-  (stdio + streamable-HTTP).
-- [requirements.txt](requirements.txt) — only `mcp` (the official SDK).
-- [Dockerfile](Dockerfile) — runtime image (`python:3.13-slim`).
-- [docker-compose.yml](docker-compose.yml) — base service definition (image,
-  env, healthcheck). Default command runs the MCP server.
-- [docker-compose.local.yml](docker-compose.local.yml) — `MODE=local` override:
-  publishes host port `8080:8080`.
-- [docker-compose.proxy.yml](docker-compose.proxy.yml) — `MODE=proxy` override:
-  joins the external `reverse-proxy` network (Traefik labels included, commented).
-- [Makefile](Makefile) — `make` entrypoints for build/run/register that pick
-  the right compose overrides and MCP URL from `MODE`.
+```
+src/
+  client.ts        # Luciq HTTP client (runtime-agnostic, fetch-based)
+  tools.ts         # MCP tool registry — shared between stdio and HTTP
+  mcp-http.ts      # Stateless MCP-over-HTTP handler (no SDK; works on Workers)
+  app.ts           # Hono app: REST + /mcp + landing + healthz + favicon
+  assets.ts        # index.html + favicon.svg inlined
+  cli.ts           # one-shot CLI (port of luciq_fetch.py)
+  bin/serve.ts     # Node HTTP entrypoint (Docker default + npm start)
+  bin/mcp-stdio.ts # MCP stdio entrypoint (Claude Desktop)
+
+api/index.ts                # Vercel function entrypoint
+functions/[[path]].ts       # Cloudflare Pages function entrypoint
+
+vercel.json                 # Vercel rewrites
+wrangler.toml               # Cloudflare Pages config
+Dockerfile                  # multi-stage Node 22 alpine build
+docker-compose.yml          # base service + healthcheck
+docker-compose.local.yml    # MODE=local: publish :8080
+docker-compose.proxy.yml    # MODE=proxy: join Traefik network
+Makefile                    # install / dev / build / Docker / Vercel / CF
+```
 
 ## MCP server (for AI agents)
 
-[luciq_mcp_server.py](luciq_mcp_server.py) implements an MCP server using the
-official Anthropic [`mcp`](https://pypi.org/project/mcp/) SDK. It supports
-two transports, controlled by `MCP_TRANSPORT`:
-
-| Transport | When to use |
-|---|---|
-| `stdio` *(default)* | Local agents (Claude Desktop, Claude Code, Cursor) — the agent spawns the server as a subprocess. |
-| `streamable-http` | Remote agents reaching the server over HTTP, e.g. through the reverse proxy. Listens on `${MCP_HOST}:${MCP_PORT}${MCP_PATH}` (defaults `0.0.0.0:8080/mcp`). |
+Same six tools, two transports. Pick the right one for your agent.
 
 ### Tools exposed
 
@@ -102,10 +137,10 @@ two transports, controlled by `MCP_TRANSPORT`:
 `token` is either the bare share token or the full
 `https://dashboard.luciq.ai/bugs/<token>` URL.
 
-### Use it from Claude Desktop / Claude Code (stdio)
+### Use from Claude Desktop / Claude Code (stdio)
 
 ```bash
-pip install -r requirements.txt
+make install && make build
 ```
 
 `~/.claude/claude_desktop_config.json` (or the project-local equivalent):
@@ -114,9 +149,8 @@ pip install -r requirements.txt
 {
   "mcpServers": {
     "luciq": {
-      "command": "python",
-      "args": ["/absolute/path/to/luciq_mcp_server.py"],
-      "env": { "MCP_TRANSPORT": "stdio" }
+      "command": "node",
+      "args": ["/absolute/path/to/luciq-instabug-mcp/dist/src/bin/mcp-stdio.js"]
     }
   }
 }
@@ -129,8 +163,10 @@ Or via Docker (stdio over `docker run -i`):
   "mcpServers": {
     "luciq": {
       "command": "docker",
-      "args": ["run","--rm","-i","-e","MCP_TRANSPORT=stdio",
-               "luciq-instabug-mcp:latest"]
+      "args": ["run","--rm","-i",
+               "--entrypoint","node",
+               "luciq-instabug-mcp:latest",
+               "/app/dist/src/bin/mcp-stdio.js"]
     }
   }
 }
@@ -138,69 +174,32 @@ Or via Docker (stdio over `docker run -i`):
 
 ### Install in Claude Code CLI (streamable-HTTP)
 
-`make mcp-add` (or `make start`) wraps the underlying command and picks the
-right URL for the current `MODE`:
+`make mcp-add` (or `make start-stack`) wraps the underlying command and picks
+the right URL for the current `MODE`:
 
 ```bash
 claude mcp add --transport http --scope user luciq http://localhost:8080/mcp
 ```
 
-`--scope user` makes it available from any project; use `--scope project`
-(default `local`) to limit it to the current repo.
+`--scope user` makes it available from any project; use `--scope project` to
+limit it to the current repo.
 
 ### Connectivity checks
 
 ```bash
-# A bare GET is rejected (406) by design — the MCP transport requires
-# content negotiation, so 406 here actually proves the endpoint is up.
-curl -i http://localhost:8080/mcp
+curl -i http://localhost:8080/healthz   # → 200 ok
+curl -i http://localhost:8080/mcp       # → 405 (stateless, POST only) — by design
+
+# Full handshake
+curl -sS -X POST http://localhost:8080/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}'
 ```
 
-For a full handshake test:
+## REST HTTP service
 
-```python
-# pip install mcp
-import asyncio
-from mcp.client.session import ClientSession
-from mcp.client.streamable_http import streamablehttp_client
-
-async def main():
-    async with streamablehttp_client("http://localhost:8080/mcp") as (r, w, _):
-        async with ClientSession(r, w) as s:
-            await s.initialize()
-            print([t.name for t in (await s.list_tools()).tools])
-
-asyncio.run(main())
-```
-
-## CLI (one-shot fetch)
-
-### Local Python
-
-After `make setup`:
-
-```bash
-.venv/bin/python luciq_fetch.py https://dashboard.luciq.ai/bugs/<token>
-# → ./bug-<number>/{bug.json, logs/*.json, screenshot.jpg}
-```
-
-Options: `-o OUT`, `--no-screenshot`, `--logs instabug_log,network_log`,
-`--quiet`.
-
-### Docker
-
-```bash
-docker build -t luciq-instabug-mcp .
-docker run --rm -v "$PWD/out:/data" \
-  --entrypoint python luciq-instabug-mcp \
-  /app/luciq_fetch.py <url-or-token>
-# → ./out/bug-<number>/
-```
-
-## REST HTTP service (Docker Compose)
-
-The same container also exposes a plain REST API (no MCP) once `make up` is
-running. Routes (all `GET`):
+Once the server is running (locally, in Docker, or on Vercel/Cloudflare),
+the same data is reachable via plain REST. Routes (all `GET`):
 
 | Path | Description |
 |---|---|
@@ -209,6 +208,7 @@ running. Routes (all `GET`):
 | `/bugs/<token>/logs` | every non-empty log merged into one JSON object |
 | `/bugs/<token>/logs/<type>` | single log (`user_steps`, `instabug_log`, `network_log`, `sessions_profiler`, …) |
 | `/bugs/<token>/screenshot[?variant=original\|big_thumb\|thumb]` | JPEG bytes |
+| `/mcp` | streamable-HTTP MCP transport (POST only) |
 
 `<token>` may be the bare token or a URL-encoded full dashboard URL.
 

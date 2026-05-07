@@ -114,6 +114,20 @@
   footer a:hover{color:var(--phos);border-color:var(--phos)}
 
   ::selection{background:var(--phos);color:#0c0a09}
+
+  /* unofficial disclaimer */
+  .disclaimer{
+    margin-top:28px;padding:14px 18px;
+    border:1px solid var(--line);border-left:2px solid var(--amber);
+    background:rgba(241,178,74,.04);
+    color:var(--dim);font-size:11.5px;line-height:1.6;
+    display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;
+  }
+  .disclaimer b{color:var(--ink);font-weight:500}
+  .disclaimer .tag{
+    color:var(--amber);font-size:10.5px;letter-spacing:.22em;
+    text-transform:uppercase;flex-shrink:0;padding-top:2px;
+  }
 </style>
 </head>
 <body>
@@ -126,7 +140,7 @@
 
   <div class="hero">
     <h1><span class="slash">/</span>bugs<br>as <span class="mcp">JSON</span></h1>
-    <p class="lead">A tiny stdlib bridge that turns a public <em>Luciq</em> (formerly Instabug) bug-report URL into clean JSON, raw logs and the original screenshot — over plain HTTP for humans, or as an <em>MCP server</em> so AI agents can read crash reports first-hand.</p>
+    <p class="lead">A tiny TypeScript bridge that turns a public <em>Luciq</em> (formerly Instabug) bug-report URL into clean JSON, raw logs and the original screenshot — over plain HTTP for humans, or as an <em>MCP server</em> so AI agents can read crash reports first-hand.</p>
   </div>
 
   <section>
@@ -228,9 +242,14 @@ curl -o shot.jpg \
     </table>
   </section>
 
+  <div class="disclaimer">
+    <span class="tag">unofficial</span>
+    Hobby project — <b>not affiliated with, endorsed by, or sponsored by Luciq / Instabug</b>. Trademarks belong to their respective owners; used here only to describe the public bug-report URLs this tool consumes.
+  </div>
+
   <footer>
-    <div>stdlib · python 3.13 · no auth</div>
-    <div><a href="/healthz">/healthz</a> &nbsp;·&nbsp; <a href="https://github.com/anthropics/mcp" target="_blank" rel="noopener">model context protocol</a></div>
+  <div>© 2026</div>
+  <div><a href="/healthz">/healthz</a> &nbsp;·&nbsp; <a href="/privacy">privacy</a> &nbsp;·&nbsp; <a href="https://github.com/anthropics/mcp" target="_blank" rel="noopener">model context protocol</a></div>
   </footer>
 
 </main>

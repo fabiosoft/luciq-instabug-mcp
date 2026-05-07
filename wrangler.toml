@@ -1,0 +1,9 @@
+# Cloudflare Pages config. The functions/ directory uses [[path]] as a
+# catch-all that delegates every request to the shared Hono app.
+name = "luciq-instabug-mcp"
+compatibility_date = "2025-01-15"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "."
+
+[vars]
+CORS_ORIGINS = "*"
