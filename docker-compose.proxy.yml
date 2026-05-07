@@ -1,0 +1,17 @@
+# MODE=proxy: join the external `reverse-proxy` network and let Traefik route
+# http://luciq.mcp.localhost/ → luciq-mcp:8080. No host port published.
+# Applied via `docker compose -f docker-compose.yml -f docker-compose.proxy.yml`.
+services:
+  luciq-mcp:
+    networks:
+      - reverse-proxy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=reverse-proxy"
+      - "traefik.http.routers.luciq-mcp.rule=Host(`luciq.mcp.localhost`)"
+      - "traefik.http.routers.luciq-mcp.entrypoints=web"
+      - "traefik.http.services.luciq-mcp.loadbalancer.server.port=8080"
+
+networks:
+  reverse-proxy:
+    external: true

@@ -13,12 +13,6 @@ services:
       # CORS allowed origins for browser-based MCP clients (MCP Inspector,
       # custom web agents). "*" works as long as no credentials are sent.
       CORS_ORIGINS: "*"
-    # Local port mapping for direct testing. Remove once you only access it
-    # through the reverse proxy.
-    # ports:
-    #   - "8080:8080"
-    networks:
-      - reverse-proxy
     healthcheck:
       # streamable-http rejects plain GETs with 406 — that proves the MCP
       # endpoint is alive without negotiating a session.
@@ -28,15 +22,3 @@ services:
       timeout: 5s
       retries: 3
       start_period: 5s
-    # Traefik labels (uncomment + adjust hostname if you use Traefik):
-    # labels:
-    #   - "traefik.enable=true"
-    #   - "traefik.docker.network=reverse-proxy"
-    #   - "traefik.http.routers.luciq-mcp.rule=Host(`luciq-mcp.local`)"
-    #   - "traefik.http.routers.luciq-mcp.entrypoints=websecure"
-    #   - "traefik.http.routers.luciq-mcp.tls=true"
-    #   - "traefik.http.services.luciq-mcp.loadbalancer.server.port=8080"
-
-networks:
-  reverse-proxy:
-    external: true

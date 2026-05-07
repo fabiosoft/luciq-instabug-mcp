@@ -1,0 +1,6 @@
+# MODE=local: publish the MCP server directly on the host at :8080.
+# Applied via `docker compose -f docker-compose.yml -f docker-compose.local.yml`.
+services:
+  luciq-mcp:
+    ports:
+      - "8080:8080"
