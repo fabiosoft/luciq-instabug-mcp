@@ -124,6 +124,18 @@
   .code .s{color:var(--phos)}
   .code .a{color:var(--amber)}
 
+  /* copy button */
+  .codewrap{position:relative}
+  .copy{
+    position:absolute;top:10px;right:10px;
+    background:transparent;border:1px solid var(--line);color:var(--dim);
+    padding:5px 10px;font-family:inherit;font-size:10.5px;
+    letter-spacing:.2em;text-transform:uppercase;cursor:pointer;
+    transition:color .15s,border-color .15s;
+  }
+  .copy:hover{color:var(--phos);border-color:var(--phos)}
+  .copy.ok{color:var(--phos);border-color:var(--phos)}
+
   .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   @media (max-width:780px){.two{grid-template-columns:1fr}}
 
@@ -164,6 +176,19 @@
 
   <section>
     <div class="h">
+      <span class="num">00</span><span class="lbl">quickstart</span>
+      <span class="ttl">one line setup.</span>
+    </div>
+    <div class="codewrap">
+      <button type="button" class="copy" data-copy="claude mcp add --transport http --scope user luciq {{ORIGIN}}/mcp">copy</button>
+<pre class="code">
+<span class="c"># install as user-scope MCP server</span>
+claude mcp add --transport http --scope user luciq <span class="a">{{ORIGIN}}/mcp</span></pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="h">
       <span class="num">01</span><span class="lbl">what it does</span>
       <span class="ttl">three things, well.</span>
     </div>
@@ -189,25 +214,7 @@
 
   <section>
     <div class="h">
-      <span class="num">02</span><span class="lbl">http endpoints</span>
-      <span class="ttl">curl-able, all GET.</span>
-    </div>
-    <table class="ep">
-      <thead><tr><th>method</th><th>path</th><th>returns</th></tr></thead>
-      <tbody>
-        <tr><td class="m">GET</td><td class="p">/healthz</td><td class="d">liveness probe → <code>ok</code></td></tr>
-        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span></td><td class="d">bug metadata + asset inventory + raw payload</td></tr>
-        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span>/logs</td><td class="d">every non-empty log merged into one JSON</td></tr>
-        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span>/logs/<span>&lt;type&gt;</span></td><td class="d">a single log type (recommended)</td></tr>
-        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span>/screenshot</td><td class="d">JPEG · <code>?variant=original|big_thumb|thumb</code></td></tr>
-        <tr><td class="m">POST</td><td class="p">/mcp</td><td class="d">streamable-HTTP MCP transport (handshake required)</td></tr>
-      </tbody>
-    </table>
-  </section>
-
-  <section>
-    <div class="h">
-      <span class="num">03</span><span class="lbl">how to use</span>
+      <span class="num">02</span><span class="lbl">how to use</span>
       <span class="ttl">two flavors.</span>
     </div>
     <div class="two">
@@ -231,17 +238,39 @@ curl -o shot.jpg \
           <div class="k">— for agents · MCP</div>
           <div class="v">Wire the MCP server into Claude Desktop / Code / Cursor.</div>
         </div>
-<pre class="code"><span class="c">// claude_desktop_config.json</span>
+<pre class="code"><span class="c"># claude code · install user-scope</span>
+claude mcp add --transport http --scope user \
+  luciq <span class="a">{{ORIGIN}}/mcp</span>
+
+<span class="c">// claude_desktop_config.json</span>
 {
   <span class="s">"mcpServers"</span>: {
     <span class="s">"luciq"</span>: {
       <span class="s">"transport"</span>: <span class="a">"streamable-http"</span>,
-      <span class="s">"url"</span>: <span class="a">"$HOST/mcp"</span>
+      <span class="s">"url"</span>: <span class="a">"{{ORIGIN}}/mcp"</span>
     }
   }
 }</pre>
       </div>
     </div>
+  </section>
+
+  <section>
+    <div class="h">
+      <span class="num">03</span><span class="lbl">http endpoints</span>
+      <span class="ttl">curl-able, all GET.</span>
+    </div>
+    <table class="ep">
+      <thead><tr><th>method</th><th>path</th><th>returns</th></tr></thead>
+      <tbody>
+        <tr><td class="m">GET</td><td class="p">/healthz</td><td class="d">liveness probe → <code>ok</code></td></tr>
+        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span></td><td class="d">bug metadata + asset inventory + raw payload</td></tr>
+        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span>/logs</td><td class="d">every non-empty log merged into one JSON</td></tr>
+        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span>/logs/<span>&lt;type&gt;</span></td><td class="d">a single log type (recommended)</td></tr>
+        <tr><td class="m">GET</td><td class="p">/bugs/<span>&lt;token&gt;</span>/screenshot</td><td class="d">JPEG · <code>?variant=original|big_thumb|thumb</code></td></tr>
+        <tr><td class="m">POST</td><td class="p">/mcp</td><td class="d">streamable-HTTP MCP transport (handshake required)</td></tr>
+      </tbody>
+    </table>
   </section>
 
   <section>
@@ -272,5 +301,18 @@ curl -o shot.jpg \
   </footer>
 
 </main>
+<script>
+document.querySelectorAll('.copy').forEach((btn) => {
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(btn.dataset.copy || '');
+      const prev = btn.textContent;
+      btn.classList.add('ok');
+      btn.textContent = 'copied';
+      setTimeout(() => { btn.classList.remove('ok'); btn.textContent = prev; }, 1400);
+    } catch {}
+  });
+});
+</script>
 </body>
 </html>
