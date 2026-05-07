@@ -9,7 +9,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
-import { INDEX_HTML, PRIVACY_HTML, FAVICON_SVG } from "./assets.js";
+import { INDEX_HTML, PRIVACY_HTML, FAVICON_SVG, OG_PNG } from "./assets.js";
 import {
   LOG_TYPES,
   LuciqError,
@@ -45,9 +45,9 @@ app.use("*", (c, next) => {
 
 // --- static -----------------------------------------------------------------
 
-app.get("/", (c) => c.html(INDEX_HTML));
+app.get("/", (c) => c.html(withOrigin(INDEX_HTML, c.req.raw)));
 
-app.get("/privacy", (c) => c.html(PRIVACY_HTML));
+app.get("/privacy", (c) => c.html(withOrigin(PRIVACY_HTML, c.req.raw)));
 
 app.get("/healthz", (c) => c.text("ok\n"));
 
@@ -58,6 +58,12 @@ app.get("/favicon.svg", (c) => {
 });
 
 app.get("/favicon.ico", (c) => c.body(null, 204));
+
+app.get("/og.png", (c) => {
+  c.header("Content-Type", "image/png");
+  c.header("Cache-Control", "public, max-age=86400");
+  return c.body(OG_PNG as unknown as ArrayBuffer);
+});
 
 // --- bug REST API -----------------------------------------------------------
 
@@ -144,6 +150,16 @@ app.notFound((c) => c.json({ error: "not found" }, 404));
 // --- helpers ----------------------------------------------------------------
 
 import type { Context } from "hono";
+
+function withOrigin(html: string, req: Request): string {
+  const fwdProto = req.headers.get("x-forwarded-proto");
+  const fwdHost = req.headers.get("x-forwarded-host");
+  const url = new URL(req.url);
+  const proto = fwdProto ?? url.protocol.replace(":", "");
+  const host = fwdHost ?? req.headers.get("host") ?? url.host;
+  const origin = `${proto}://${host}`;
+  return html.replaceAll("{{ORIGIN}}", origin);
+}
 
 function errorResponse(c: Context, e: unknown): Response {
   if (e instanceof LuciqError) {
