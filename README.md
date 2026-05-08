@@ -1,9 +1,6 @@
 # luciq-instabug-mcp
 
-> **Disclaimer** — Unofficial hobby project. Not affiliated with, endorsed by,
-> or sponsored by Luciq / Instabug. "Luciq" and "Instabug" are trademarks of
-> their respective owners and are used here only to describe the public bug
-> report URLs this tool consumes.
+![](./src/assets/og.png)
 
 Fetch logs and screenshot from a public **Luciq** (formerly Instabug) bug
 report URL like `https://dashboard.luciq.ai/bugs/<token>`.
@@ -14,6 +11,37 @@ them promptly.
 
 Same data exposed two ways: a flat REST API and a Model Context Protocol
 server (stdio + streamable-HTTP). Written in TypeScript, deployable to **Docker**, **Vercel** and **Cloudflare Pages** from the same source.
+
+## Install in Claude Code CLI
+
+The fastest path — clone, build, register the stdio transport in user scope:
+
+```bash
+make install && make build
+make mcp-add-stdio   # claude mcp add --scope user luciq -- node $PWD/dist/src/bin/mcp-stdio.js
+make mcp-list        # → luciq: ... ✓ Connected
+```
+
+No daemon, no port — Claude Code spawns the Node process on demand.
+
+Need an HTTP transport (Docker, remote, multi-client)? See
+[Quickstart (Docker locale)](#quickstart-docker-locale) and use `make mcp-add`.
+
+Manual equivalents:
+
+```bash
+# Node stdio (absolute path to the built entrypoint in this repo)
+claude mcp add --scope user luciq -- node ~/luciq-instabug-mcp/dist/src/bin/mcp-stdio.js
+
+# Docker, MODE=local (streamable-HTTP on :8080)
+claude mcp add --transport http --scope user luciq http://localhost:8080/mcp
+
+# Docker, MODE=proxy (Traefik reverse proxy on :80)
+claude mcp add --transport http --scope user luciq http://luciq.mcp.localhost/mcp
+```
+
+`--scope user` makes it available from any project; use `--scope project` to
+limit it to the current repo.
 
 ## Quickstart (Docker locale)
 
@@ -172,18 +200,6 @@ Or via Docker (stdio over `docker run -i`):
 }
 ```
 
-### Install in Claude Code CLI (streamable-HTTP)
-
-`make mcp-add` (or `make start-stack`) wraps the underlying command and picks
-the right URL for the current `MODE`:
-
-```bash
-claude mcp add --transport http --scope user luciq http://localhost:8080/mcp
-```
-
-`--scope user` makes it available from any project; use `--scope project` to
-limit it to the current repo.
-
 ### Connectivity checks
 
 ```bash
@@ -221,3 +237,8 @@ the signed CloudFront URLs we download.
 Available log types: `user_steps`, `console_log`, `instabug_log`, `user_data`,
 `network_log`, `user_events`, `sessions_profiler`. Logs are JSON arrays of
 entries (the client returns parsed JSON when possible, raw text otherwise).
+
+> **Disclaimer** — Unofficial hobby project. Not affiliated with, endorsed by,
+> or sponsored by Luciq / Instabug. "Luciq" and "Instabug" are trademarks of
+> their respective owners and are used here only to describe the public bug
+> report URLs this tool consumes.

@@ -1,6 +1,6 @@
 .PHONY: help install dev build start typecheck clean \
         net docker-build up down restart logs ps health \
-        mcp-add mcp-remove mcp-list start-stack \
+        mcp-add mcp-add-stdio mcp-remove mcp-list start-stack \
         vercel-dev vercel-deploy cf-dev cf-deploy
 
 # ------------------------------------------------------------------ config
@@ -10,6 +10,7 @@ MCP_NAME      ?= luciq
 MCP_URL_LOCAL ?= http://localhost:8080/mcp
 MCP_URL_PROXY ?= http://luciq.mcp.localhost/mcp
 MCP_SCOPE     ?= user
+MCP_STDIO_BIN ?= $(CURDIR)/dist/src/bin/mcp-stdio.js
 
 # ------------------------------------------------------------------ mode
 # MODE selects the Docker deploy shape. Override on the command line:
@@ -85,6 +86,11 @@ health: ## Probe /healthz on the current MODE
 mcp-add: ## Register MCP in Claude CLI for the current MODE
 	@echo "→ claude mcp add ... $(MCP_URL)"
 	claude mcp add --transport http --scope $(MCP_SCOPE) $(MCP_NAME) $(MCP_URL)
+
+mcp-add-stdio: ## Register MCP via Node stdio (absolute path to dist/)
+	@test -f $(MCP_STDIO_BIN) || (echo "✗ $(MCP_STDIO_BIN) not found — run 'make build' first" && exit 1)
+	@echo "→ claude mcp add ... node $(MCP_STDIO_BIN)"
+	claude mcp add --scope $(MCP_SCOPE) $(MCP_NAME) -- node $(MCP_STDIO_BIN)
 
 mcp-remove: ## Remove the MCP registration
 	claude mcp remove $(MCP_NAME) -s $(MCP_SCOPE)
