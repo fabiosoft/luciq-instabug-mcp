@@ -1,0 +1,56 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to (re)build, e.g. v0.2.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.TAG }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install all deps
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Prune to production deps
+        run: npm prune --omit=dev
+
+      - name: Stage tarball contents
+        run: |
+          VERSION="${TAG#v}"
+          STAGE="luciq-instabug-mcp-${VERSION}"
+          mkdir -p "stage/${STAGE}"
+          cp -R dist node_modules package.json package-lock.json LICENSE README.md "stage/${STAGE}/"
+          tar -C stage -czf "luciq-instabug-mcp-${VERSION}.tar.gz" "${STAGE}"
+          shasum -a 256 "luciq-instabug-mcp-${VERSION}.tar.gz" | tee SHA256SUMS
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.TAG }}
+          files: |
+            luciq-instabug-mcp-*.tar.gz
+            SHA256SUMS
+          generate_release_notes: true
