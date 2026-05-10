@@ -1,7 +1,8 @@
 .PHONY: help install dev build start typecheck clean \
         net docker-build up down restart logs ps health \
         mcp-add mcp-add-stdio mcp-remove mcp-list start-stack \
-        vercel-dev vercel-deploy cf-dev cf-deploy
+        vercel-dev vercel-deploy cf-dev cf-deploy \
+        release
 
 # ------------------------------------------------------------------ config
 NPM           ?= npm
@@ -107,6 +108,11 @@ vercel-dev: ## Run Vercel dev server (auto-installs vercel CLI on demand)
 
 vercel-deploy: ## Deploy to Vercel (production)
 	npx vercel deploy --prod
+
+# ------------------------------------------------------------------ release
+release: ## Cut a new release end-to-end (usage: make release VERSION=0.3.0)
+	@test -n "$(VERSION)" || (echo "✗ VERSION required, e.g. make release VERSION=0.3.0" && exit 1)
+	./scripts/release.sh $(VERSION)
 
 # ------------------------------------------------------------------ cloudflare pages
 cf-dev: ## Run Cloudflare Pages dev (wrangler)

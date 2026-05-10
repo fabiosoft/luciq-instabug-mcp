@@ -29,13 +29,8 @@ Register the stdio transport in Claude Code:
 claude mcp add --scope user luciq -- luciq-instabug-mcp-stdio
 ```
 
-> The Homebrew tap lives at
-> [fabiosoft/homebrew-tap](https://github.com/fabiosoft/homebrew-tap). To
-> publish a new version, push a `vX.Y.Z` tag — the
-> [`release` workflow](.github/workflows/release.yml) builds the tarball, then
-> bump `url` + `sha256` in the formula at
-> [homebrew/luciq-instabug-mcp.rb](homebrew/luciq-instabug-mcp.rb) and copy it
-> into the tap repo.
+Tap repo: [fabiosoft/homebrew-tap](https://github.com/fabiosoft/homebrew-tap).
+For maintainers cutting a new version, see [Releasing](#releasing).
 
 ## Install in Claude Code CLI
 
@@ -262,6 +257,29 @@ the signed CloudFront URLs we download.
 Available log types: `user_steps`, `console_log`, `instabug_log`, `user_data`,
 `network_log`, `user_events`, `sessions_profiler`. Logs are JSON arrays of
 entries (the client returns parsed JSON when possible, raw text otherwise).
+
+## Releasing
+
+Bump, tag, build the tarball, update the Homebrew tap — one command:
+
+```bash
+make release VERSION=0.3.0
+```
+
+Under the hood ([scripts/release.sh](scripts/release.sh)):
+
+1. `npm version` bumps `package.json`, then commits + tags `vX.Y.Z` and pushes
+2. The [`release` workflow](.github/workflows/release.yml) builds a
+   self-contained tarball (`dist/` + production `node_modules`) and publishes
+   it as a release asset alongside `SHA256SUMS`
+3. The script clones [fabiosoft/homebrew-tap](https://github.com/fabiosoft/homebrew-tap),
+   rewrites `url` + `sha256` in `Formula/luciq-instabug-mcp.rb`, commits and
+   pushes — `brew upgrade luciq-instabug-mcp` works immediately for users
+
+Requires `gh` logged in to the source-repo owner. The local formula at
+[homebrew/luciq-instabug-mcp.rb](homebrew/luciq-instabug-mcp.rb) is the
+template kept in sync with the published one — edit there for structural
+changes (description, test block, etc.) and copy into the tap.
 
 > **Disclaimer** — Unofficial hobby project. Not affiliated with, endorsed by,
 > or sponsored by Luciq / Instabug. "Luciq" and "Instabug" are trademarks of
