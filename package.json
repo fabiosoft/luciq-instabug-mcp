@@ -1,6 +1,6 @@
 {
   "name": "luciq-instabug-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Bridge that turns a public Luciq (Instabug) bug-report URL into JSON, raw logs and screenshot — REST + MCP.",
   "type": "module",
   "license": "MIT",
