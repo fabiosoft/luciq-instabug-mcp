@@ -12,6 +12,31 @@ them promptly.
 Same data exposed two ways: a flat REST API and a Model Context Protocol
 server (stdio + streamable-HTTP). Written in TypeScript, deployable to **Docker**, **Vercel** and **Cloudflare Pages** from the same source.
 
+## Install via Homebrew
+
+```bash
+brew install fabiosoft/tap/luciq-instabug-mcp
+```
+
+Two binaries are exposed:
+
+- `luciq-instabug-mcp` — HTTP server (`PORT=8080` by default)
+- `luciq-instabug-mcp-stdio` — MCP stdio transport for Claude Desktop / Claude Code
+
+Register the stdio transport in Claude Code:
+
+```bash
+claude mcp add --scope user luciq -- luciq-instabug-mcp-stdio
+```
+
+> The Homebrew tap lives at
+> [fabiosoft/homebrew-tap](https://github.com/fabiosoft/homebrew-tap). To
+> publish a new version, push a `vX.Y.Z` tag — the
+> [`release` workflow](.github/workflows/release.yml) builds the tarball, then
+> bump `url` + `sha256` in the formula at
+> [homebrew/luciq-instabug-mcp.rb](homebrew/luciq-instabug-mcp.rb) and copy it
+> into the tap repo.
+
 ## Install in Claude Code CLI
 
 The fastest path — clone, build, register the stdio transport in user scope:

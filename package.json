@@ -3,7 +3,25 @@
   "version": "0.2.0",
   "description": "Bridge that turns a public Luciq (Instabug) bug-report URL into JSON, raw logs and screenshot — REST + MCP.",
   "type": "module",
-  "private": true,
+  "license": "MIT",
+  "author": "Fabio Nisci <fabionisci@gmail.com>",
+  "homepage": "https://github.com/fabiosoft/luciq-instabug-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fabiosoft/luciq-instabug-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fabiosoft/luciq-instabug-mcp/issues"
+  },
+  "bin": {
+    "luciq-instabug-mcp": "dist/src/bin/serve.js",
+    "luciq-instabug-mcp-stdio": "dist/src/bin/mcp-stdio.js"
+  },
+  "files": [
+    "dist/src",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "assets": "node scripts/build-assets.mjs",
     "dev": "node scripts/dev.mjs",
@@ -11,7 +29,7 @@
     "start": "tsx src/bin/serve.ts",
     "prebuild": "npm run assets",
     "build": "tsc -p tsconfig.json",
-    "serve": "node dist/bin/serve.js",
+    "serve": "node dist/src/bin/serve.js",
     "premcp:stdio": "npm run assets",
     "mcp:stdio": "tsx src/bin/mcp-stdio.ts",
     "fetch": "tsx src/cli.ts",
